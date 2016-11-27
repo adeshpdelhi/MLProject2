@@ -12,9 +12,11 @@ def readDataSet(file):
 		if(len(row) <= 1):
 			continue
 		row[-1] = row[-1].split('\n')[0]
+		x = row[-1]
 		row = map(float, row[:])
 		X.append(row)
 	f.close()
 	shuffle(X)
 	# print (X[0:10])
 	return np.array(X), len(X), len(X[0])
+

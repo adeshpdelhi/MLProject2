@@ -9,45 +9,46 @@ from keras.optimizers import SGD, Adam, RMSprop
 from keras.utils import np_utils
 
 from readFile import readDataSet
+from sklearn import preprocessing
+
+from sklearn.feature_selection import VarianceThreshold
 
 
-batch_size = 128
+batch_size = 256
 nb_classes = 5
-nb_epoch = 3
+nb_epoch = 10
 
-# from loadDataset import *
+data, nrows, ncols = readDataSet("DATASET_WITH_ENCODED_CLASS_NAMES.csv")
 
-data, nrows, ncols = readDataSet("dataset-har-PUC-Rio-ugulino.csv")
-# X_train = data[0:50000,0:17]
-# y_train = data[0:50000,17]
-# X_test = data[60000:70000,0:17]
-# y_test = data[60000:70000,17]
+X_train = data[:150000, 0:ncols-1]
+y_train = data[:150000,ncols-1]
+X_test =  data[150000:, 0:ncols-1]
+y_test = data[150000:, ncols-1]
 
-X_test = X_train = data[:,0:17]
-y_test = y_train = data[:,17]
+sel = VarianceThreshold(threshold=(.8 * (1 - .8)))
+X_red = sel.fit_transform(X_train)
 
-print X_train, X_test
-print y_train, y_test
-# (X_train,y_train, X_test,y_test) = loadMNIST();
-# X_train = X_train.astype('float32')
-# X_test = X_test.astype('float32')
-# X_train /= 255
-# X_test /= 255
+print X_red[0:10] , len(X_red[0])
+print X_train[0:10], len(X_train[0])
+print y_train[0:10]
 
-# # convert class vectors to binary class matrices
+X_train = X_train.astype('float32')
+X_test = X_test.astype('float32')
+
 Y_train = np_utils.to_categorical(y_train, nb_classes)
 Y_test = np_utils.to_categorical(y_test, nb_classes)
 
+print Y_train[0:10]
 model = Sequential()
-model.add(Dense(output_dim=500, input_dim=17, activation='tanh'))
+model.add(Dense(output_dim=250, input_dim=18, activation='tanh'))
 model.add(Dropout(0.2))
-model.add(Dense(output_dim=250,input_dim=500,activation='tanh'))
+model.add(Dense(output_dim=500,input_dim=250,activation='sigmoid'))
 model.add(Dropout(0.2))
-model.add(Dense(output_dim=5,input_dim=250,activation='softmax'))
+model.add(Dense(output_dim=5,input_dim=500,activation='softmax'))
 
 print model.summary()
-
-sgd = SGD(lr=0.7)
+lr = 0.01
+sgd = SGD(lr=lr)
 # rMSprop = RMSprop(lr=0.3)
 model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
 
@@ -60,13 +61,23 @@ y_pred = model.predict_classes(X_test,verbose=0)
 print y_pred
 print y_test
 
-model.save("Keras_SGD_lR_0_7.h5")
+model.save("Keras_SGD_lR_"+str(lr)+".h5")
 
 from sklearn.metrics import confusion_matrix
 from plot_confusion_matrix import *
 cm = confusion_matrix(y_test, y_pred)
 np.set_printoptions(precision=2)
-plot_confusion_matrix(cm,[0,1,2,3,4,5,6,7,8,9],normalize=False,title="Confusion Matrix without normalization with (LR = 0.7)")
-plt.savefig("CM_PLOT_Keras_SGD_lR_0_7.png")
+plot_confusion_matrix(cm,[0,1,2,3,4],normalize=False,title="Confusion Matrix without normalization with (LR = "+str(lr)+")")
+plt.savefig("CM_PLOT_Keras_SGD_lR_"+str(lr)+".png")
 
 
+from sklearn.preprocessing import LabelBinarizer
+import generateROC
+
+y_score = model.predict(X_test)
+print "y_score: ", y_score
+plt.clf()
+fpr,tpr,thdAddr = generateROC.generate_roc(y_score,Y_test,nROCpts =1000 ,plotROC='false',title="ROC PLOT SGD: lr= "+str(lr))
+plt.savefig("ROC_PLOT_Keras_SGD_lR_"+str(lr)+".png")
+# print "fpr: ",fpr,"tpr: ",tpr,"thdaddr: ",thdAddr
+# return fpr, tpr, thdAddr
