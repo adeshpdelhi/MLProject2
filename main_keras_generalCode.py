@@ -12,6 +12,7 @@ from readFile import readDataSet
 from sklearn import preprocessing
 
 from sklearn.feature_selection import VarianceThreshold
+from sklearn.preprocessing import StandardScaler,Normalizer
 
 def fit(X_train, Y_train, X_test,Y_test, input_dim, output_dim, solver = 'sgd', lr = 0.01, nlayers = 2, 
 	neuronsPerLayer = [250,500], batch_size = 256, nb_epoch = 10, verbose = 1, validation_split = 0.1, 
@@ -72,7 +73,7 @@ def fit(X_train, Y_train, X_test,Y_test, input_dim, output_dim, solver = 'sgd', 
 	plt.clf()
 	fpr,tpr,thdAddr = generateROC.generate_roc(y_score,Y_test,nROCpts =1000 ,plotROC='false',title="ROC PLOT SGD: lr= "+str(lr))
 	plt.savefig("ROC_PLOT_Keras_"+solver+"_hiddenlayers:"+str(nlayers)+" "+str(neuronsPerLayer)+"_lR_"+str(lr)+".png")
-
+	return score[1]
 
 batch_size = 256
 nb_classes = 5
@@ -92,6 +93,16 @@ print X_red[0:10] , len(X_red[0])
 print X_train[0:10], len(X_train[0])
 print y_train[0:10]
 
+# print "Standardized data :)"
+# stdscl = StandardScaler()
+
+# X_train = stdscl.fit_transform(X_train,y_train)
+# X_test = stdscl.fit_transform(X_test,y_test)
+# print "Normalized :)"
+# X_train = Normalizer().fit_transform(X_train,y_train)
+# X_test = Normalizer().fit_transform(X_test,y_test)
+# print X_train[0:10]
+
 X_train = X_train.astype('float32')
 X_test = X_test.astype('float32')
 
@@ -101,6 +112,32 @@ Y_test = np_utils.to_categorical(y_test, nb_classes)
 print Y_train[0:10]
 input_dim = ncols-1
 output_dim = nb_classes
-fit(X_train,Y_train,X_test,Y_test,input_dim,output_dim)
-# print "fpr: ",fpr,"tpr: ",tpr,"thdaddr: ",thdAddr
-# return fpr, tpr, thdAddr
+lrs = [0.0001,0.001,0.05,0.02,0.01,0.5,0.1]
+bestAcc = 0
+nlayers = 0
+l_r = 0
+nlyr = [2,3,4]
+neurons = [50,100,200,400]
+nFits = 0
+acc = fit(X_train,Y_train,X_test,Y_test,input_dim,output_dim,lr=0.02,nlayers = 2, 
+				neuronsPerLayer=[1000,1000])
+
+# for i in range(0,len(nlyr)):
+# 	for j in range(0,len(neurons)-nlyr[i]+1):
+# 		nNrns = neurons[j:j+nlyr[i]]
+# 		for k in range (0,len(lrs)):
+# 			nFits = nFits + 1
+# 			acc = fit(X_train,Y_train,X_test,Y_test,input_dim,output_dim,lr=lrs[k],nlayers = nlyr[i], 
+# 				neuronsPerLayer=nNrns)
+# 			if(bestAcc < acc):
+# 				bestAcc = acc
+# 				nlayers = nlyr[i]
+# 				l_r = lrs[k]
+# 				neuronsPerLayer = nNrns 
+
+# print "best Accuracy :",bestAcc
+# print "nlayers: ",nlayers
+# print "neuronsPerLayer: ",neuronsPerLayer
+# print "learning_rate: ", l_r
+# # print "fpr: ",fpr,"tpr: ",tpr,"thdaddr: ",thdAddr
+# # return fpr, tpr, thdAddr
