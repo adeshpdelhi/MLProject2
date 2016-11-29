@@ -69,7 +69,7 @@ X_test1 , y_test1 = create_subset(200,X_test,y_test)
 print X_train, len(X_train)
 print y_train,len(y_train)
 kernel = 'rbf'
-C = 0.001    
+C = 0.01    
 gamma = 1e-10
 clf = OneVsRestClassifier(SVC(kernel=kernel,C=C,verbose=True, gamma = gamma),n_jobs = 3)
 clf.fit(X_train,y_train)
@@ -102,7 +102,7 @@ Y_test = np_utils.to_categorical(y_test, 5)
 y_score = clf.decision_function(X_test)
 print "y_score: ", y_score
 plt.clf()
-fpr,tpr,thdAddr = generateROC.generate_roc(y_score.transpose(),Y_test,nROCpts =100 ,plotROC='false',title="ROC PLOT :" + kernel+ "; (C: "+str(C)+")")
+fpr,tpr,thdAddr = generateROC.generate_roc(y_score,Y_test,nROCpts =1000 ,plotROC='false',title="ROC PLOT :" + kernel+ "; (C: "+str(C)+")")
 plt.savefig("./SVC/ROC_PLOT_SVM_"+kernel+"_C:"+str(C)+".png")
 
 

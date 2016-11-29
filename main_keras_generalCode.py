@@ -119,7 +119,7 @@ l_r = 0
 nlyr = [2,3,4]
 neurons = [50,100,200,400]
 nFits = 0
-acc = fit(X_train,Y_train,X_test,Y_test,input_dim,output_dim,lr=0.02,nlayers = 2, 
+acc = fit(X_train,Y_train,X_test,Y_test,input_dim,output_dim,lr=0.008,nlayers = 2, 
 				neuronsPerLayer=[1000,1000])
 
 # for i in range(0,len(nlyr)):
