@@ -68,17 +68,19 @@ X_train,y_train = create_subset(2000,X_train,y_train)
 X_test1 , y_test1 = create_subset(200,X_test,y_test)
 print X_train, len(X_train)
 print y_train,len(y_train)
-kernel = 'rbf'
-C = 0.01    
+kernel = 'linear'
+C = 0.0001    
 gamma = 1e-10
 clf = OneVsRestClassifier(SVC(kernel=kernel,C=C,verbose=True, gamma = gamma),n_jobs = 3)
 clf.fit(X_train,y_train)
 print clf.predict(X_test1)
 print y_test1
 print clf.score(X_test1,y_test1)
+from sklearn.metrics import f1_score
 joblib.dump(clf, "./SVC/multi"+kernel+"_"+str(C)+".pkl")
 y_pred = clf.predict(X_test)
 print y_pred
+print f1_score(y_test, y_pred, average='macro')  
 
 print "kernel: ",kernel
 print "C: ",C 

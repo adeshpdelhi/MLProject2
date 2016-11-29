@@ -31,7 +31,7 @@ def fit(X_train, Y_train, X_test,Y_test, input_dim, output_dim, solver = 'sgd', 
 	model.add(Dropout(0.2))
 
 	for i in range (1, nlayers):
-		model.add(Dense(output_dim=neuronsPerLayer[i],input_dim=neuronsPerLayer[i-1],activation='sigmoid'))
+		model.add(Dense(output_dim=neuronsPerLayer[i],input_dim=neuronsPerLayer[i-1],activation='tanh'))
 		model.add(Dropout(0.2))
 
 	model.add(Dense(output_dim=output_dim,input_dim=neuronsPerLayer[nlayers-1],activation='softmax'))
@@ -53,6 +53,8 @@ def fit(X_train, Y_train, X_test,Y_test, input_dim, output_dim, solver = 'sgd', 
 	y_pred = model.predict_classes(X_test,verbose=0)
 	print y_pred
 	print y_test
+	from sklearn.metrics import f1_score
+	print f1_score(y_test, y_pred, average='macro')  
 
 	model.save("Keras_"+solver+"_hiddenlayers:"+str(nlayers)+" "+str(neuronsPerLayer)+"_lR_"+str(lr)+".h5")
 
@@ -119,7 +121,7 @@ l_r = 0
 nlyr = [2,3,4]
 neurons = [50,100,200,400]
 nFits = 0
-acc = fit(X_train,Y_train,X_test,Y_test,input_dim,output_dim,lr=0.008,nlayers = 2, 
+acc = fit(X_train,Y_train,X_test,Y_test,input_dim,output_dim,lr=0.01,nlayers = 2, 
 				neuronsPerLayer=[1000,1000])
 
 # for i in range(0,len(nlyr)):

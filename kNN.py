@@ -38,7 +38,7 @@ Y_test = np_utils.to_categorical(y_test, 5)
 from sklearn.model_selection import cross_val_score
 from sklearn.neighbors import KNeighborsClassifier
 neigh = KNeighborsClassifier(n_neighbors=3,weights = 'distance' ,n_jobs = 3)
-print(np.mean(cross_val_score(neigh, X_train, y_train,cv=10,scoring='f1'))) 
+print(np.mean(cross_val_score(neigh, X_train, y_train,cv=10,scoring='neg_log_loss'))) 
 
 neigh.fit(X_train, y_train) 
 y_pred = neigh.predict(X_test)
